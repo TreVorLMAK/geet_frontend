@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 const Navbar = () => {
   return (
-    <nav className="bg-white border-gray-200 py-2.5 dark:bg-gray-900 ">
+    <nav className="bg-white border-gray-200 py-2.5 dark:bg-gray-900 fixed w-full ">
     <div className="flex flex-wrap items-center justify-between max-w-screen-xl px-4 mx-auto">
         <Link to="/" className="flex items-center">
             <img src="https://www.svgrepo.com/show/499962/music.svg" className="h-6 mr-3 sm:h-9" alt="Landwind Logo" />
@@ -42,10 +42,6 @@ const Navbar = () => {
                 <li>
                     <Link to="/artist"
                         className="block py-2 pl-3 pr-4 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-purple-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700">Artist</Link>
-                </li>
-                <li>
-                    <Link to="/album"
-                        className="block py-2 pl-3 pr-4 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-purple-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700">Albums</Link>
                 </li>
                 <li>
                     <Link to="/features"

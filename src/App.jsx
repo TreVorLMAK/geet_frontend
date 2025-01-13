@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import { useState } from "react";
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Artist from './pages/Artist';
 
 const App = () => {
   const [count, setCount] = useState(0)
@@ -13,6 +14,7 @@ const App = () => {
       <Route path="/" element={<Home />} />
       <Route path='/login' element = {<Login/>}/>
       <Route path='/register' element = {<Register/>}/>
+      <Route path='/artist' element = {<Artist/>}/>
     </Routes>
     </BrowserRouter>
   )

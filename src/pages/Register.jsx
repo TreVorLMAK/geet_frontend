@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import Navbar from "../components/Navbar";
+import { Link } from "react-router-dom";
+import Footer from "../components/Footer";
 
 const Register = () => {
   const [formValues, setFormValues] = useState({
@@ -59,6 +61,7 @@ const Register = () => {
   return (
     <>
     <Navbar/>
+    <br />
     <div className="bg-[#dfa674] flex items-center justify-center min-h-screen p-4">
       <div className="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full animate-fade-in">
         <h2 className="text-2xl font-bold text-center text-indigo-800 mb-8">
@@ -165,15 +168,18 @@ const Register = () => {
 
         <p className="text-center text-gray-600 mt-6">
           Already have an account?{" "}
-          <a
-            href="/login"
+          <Link
+            to="/login"
             className="text-indigo-800 font-semibold hover:text-blue-900 transition-colors duration-300"
           >
             Sign In
-          </a>
+          </Link>
         </p>
       </div>
     </div>
+    <br />
+    <Footer></Footer>
+    <br />
     </>
   );
   
