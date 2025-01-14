@@ -1,6 +1,7 @@
 import React from 'react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import { Link } from 'react-router-dom'
 
 const Home = () => {
   return (
@@ -29,10 +30,10 @@ const Home = () => {
                 </div>
             </h1>
             <div className="mt-5 sm:mt-8 sm:flex sm:justify-center">
-                <div className="rounded-md shadow"><a
+                <div className="rounded-md shadow"><Link to="/artist"
                         className="flex w-full items-center justify-center rounded-md border border-transparent bg-blue-600 px-8 py-3 text-base font-medium text-white hover:bg-blue-700 md:py-4 md:px-10 md:text-lg"
-                        href="#">Explore Albums
-                    </a>
+                        href="#">Explore Artists
+                    </Link>
                 </div>
             </div>
         </div>
