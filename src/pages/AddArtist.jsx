@@ -14,8 +14,9 @@ const AddArtist = () => {
     setArtistName(name);
     if (name.length > 2) {
       try {
+        const apiKey = import.meta.env.VITE_APP_LASTFM_API_KEY; // Correctly access the environment variable
         const response = await axios.get(
-          `https://ws.audioscrobbler.com/2.0/?method=artist.search&artist=${name}&api_key=${process.env.VITE_APP_LASTFM_API_KEY}&format=json`
+          `https://ws.audioscrobbler.com/2.0/?method=artist.search&artist=${name}&api_key=${apiKey}&format=json`
         );
         const artistSuggestions = response.data.results.artistmatches.artist;
         setSuggestions(artistSuggestions.slice(0, 5)); // Show top 5 suggestions
@@ -38,26 +39,34 @@ const AddArtist = () => {
       setError('Please select an artist from the suggestions.');
       return;
     }
+  
+const artistData = {
+  name: selectedArtist.name,
+  image: selectedArtist.image?.[2]?.['#text'] || '', 
+  listeners: selectedArtist.listeners || 0,
+  playcount: selectedArtist.playcount || 0,
+  bio: 'Artist biography not available from suggestions.',
+  mbid: selectedArtist.mbid || null, 
+};
 
+  
     try {
-      const response = await axios.post('http://localhost:3000/api/artists', {
-        name: selectedArtist.name,
-        image: selectedArtist.image?.[2]['#text'], // Medium-sized image
-        listeners: selectedArtist.listeners,
-        bio: 'Artist biography not available from suggestions.', // Placeholder bio
-      });
-
+      const response = await axios.post('http://localhost:3000/api/artists/add', artistData);
+  
+      console.log('Artist added response:', response.data);
+  
       setSuccess('Artist added successfully!');
       setError('');
       setArtistName('');
       setSuggestions([]);
       setSelectedArtist(null);
     } catch (err) {
+      console.error('Error adding artist:', err); // Log error for debugging
       setError('Failed to add artist. Please try again later.');
       setSuccess('');
     }
   };
-
+  
   return (
     <>
       <Navbar />

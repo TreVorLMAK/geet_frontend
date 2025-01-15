@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom'; // Import useNavigate
 import Footer from './Footer';
 import Navbar from './Navbar';
 
@@ -8,6 +8,7 @@ const ArtistDetail = () => {
   const { artistName } = useParams(); // Extract artist name from the URL
   const [artist, setArtist] = useState(null);
   const [albums, setAlbums] = useState([]);
+  const navigate = useNavigate(); // Hook for navigation
 
   useEffect(() => {
     const fetchArtistData = async () => {
@@ -31,6 +32,12 @@ const ArtistDetail = () => {
     return <div>Loading...</div>;
   }
 
+  // Handle click on album
+  const handleAlbumClick = (albumId) => {
+    // Redirect to the album details page
+    navigate(`/albums/${albumId}`);
+  };
+
   return (
     <>
       <Navbar />
@@ -43,7 +50,11 @@ const ArtistDetail = () => {
           <h2 className="text-2xl sm:text-3xl font-semibold">Albums</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
             {albums.map((album) => (
-              <div key={album.mbid} className="bg-gray-100 p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+              <div
+                key={album.mbid}
+                className="bg-gray-100 p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+                onClick={() => handleAlbumClick(album.mbid)} // Handle album click
+              >
                 <img 
                   src={album.image[2]['#text']} 
                   alt={album.name} 
