@@ -39,7 +39,7 @@ const AlbumDetails = () => {
         rating,
         comment: reviewText,
       };
-      await axios.post('/api/reviews', reviewData, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+      await axios.post('http://localhost:3000/api/albums/:albumId/review', reviewData, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
       setReviewText('');
       setRating(1);
       // Re-fetch reviews after adding a new one

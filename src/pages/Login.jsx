@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import Navbar from '../components/Navbar'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import Footer from '../components/Footer'
 import axios from 'axios'
 
@@ -8,24 +8,35 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  
+  const navigate = useNavigate()  // Initialize useNavigate
+
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev)
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    const formData = { email, password }
-
+    e.preventDefault();
+  
     try {
-      const response = await axios.post('/api/login', formData)
-      console.log('Login success:', response.data)
-      // Handle successful login (e.g., redirect or store token)
+      const response = await axios.post('http://localhost:3000/api/auth/login', {
+        email,
+        password,
+      }, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      console.log('Login successful:', response.data);
+  
+      // Store token in localStorage (or you can store it in cookies)
+      localStorage.setItem('token', response.data.token);
+  
+      // Navigate to the homepage or dashboard after successful login
+      navigate('/profile');
     } catch (error) {
-      console.error('Login error:', error)
-      // Handle error (e.g., show error message)
+      console.log('Login error:', error.response ? error.response.data : error.message);
     }
-  }
+  };
+  
+  
 
   return (
     <>

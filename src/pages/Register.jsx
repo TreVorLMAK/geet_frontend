@@ -1,7 +1,8 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import { Link } from "react-router-dom";
 import Footer from "../components/Footer";
+import { Link } from "react-router-dom";
 
 const Register = () => {
   const [formValues, setFormValues] = useState({
@@ -17,6 +18,7 @@ const Register = () => {
     confirmPassword: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -24,12 +26,12 @@ const Register = () => {
     setFormErrors({ ...formErrors, [id]: "" });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const errors = {};
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    const passwordStrengthPattern = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/; // Example: At least 8 chars, one uppercase, one number, one special char
+    const passwordStrengthPattern = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
 
     if (!formValues.username.trim()) {
       errors.username = "Username is required.";
@@ -42,7 +44,8 @@ const Register = () => {
     if (!formValues.password) {
       errors.password = "Password is required.";
     } else if (!passwordStrengthPattern.test(formValues.password)) {
-      errors.password = "Password must be at least 8 characters, contain an uppercase letter, a number, and a special character.";
+      errors.password =
+        "Password must be at least 8 characters, contain an uppercase letter, a number, and a special character.";
     }
 
     if (formValues.password !== formValues.confirmPassword) {
@@ -52,13 +55,31 @@ const Register = () => {
     setFormErrors(errors);
 
     if (Object.keys(errors).length === 0) {
-      alert("Form submitted successfully!");
-      setFormValues({
-        username: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-      });
+      try {
+        const response = await fetch("http://localhost:3000/api/auth/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: formValues.username,
+            email: formValues.email,
+            password: formValues.password,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          alert("Registration successful! Redirecting to login...");
+          navigate("/login"); // Navigate to the login page
+        } else {
+          alert(data.message || "Registration failed.");
+        }
+      } catch (error) {
+        console.error("Error during registration:", error);
+        alert("Something went wrong. Please try again.");
+      }
     }
   };
 
