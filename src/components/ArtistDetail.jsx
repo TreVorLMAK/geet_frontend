@@ -35,7 +35,7 @@ const ArtistDetail = () => {
   // Handle click on album
   const handleAlbumClick = (albumId) => {
     // Redirect to the album details page
-    navigate(`/albums/${albumId}`);
+    navigate(`/albums/${artistName}/${albumId}`);
   };
 
   return (

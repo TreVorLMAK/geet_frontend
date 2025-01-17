@@ -9,12 +9,13 @@ const AddArtist = () => {
   const [selectedArtist, setSelectedArtist] = useState(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSearch = async (name) => {
     setArtistName(name);
     if (name.length > 2) {
       try {
-        const apiKey = import.meta.env.VITE_APP_LASTFM_API_KEY; // Correctly access the environment variable
+        const apiKey = import.meta.env.VITE_APP_LASTFM_API_KEY;
         const response = await axios.get(
           `https://ws.audioscrobbler.com/2.0/?method=artist.search&artist=${name}&api_key=${apiKey}&format=json`
         );
@@ -40,15 +41,23 @@ const AddArtist = () => {
       return;
     }
   
-const artistData = {
-  name: selectedArtist.name,
-  image: selectedArtist.image?.[2]?.['#text'] || '', 
-  listeners: selectedArtist.listeners || 0,
-  playcount: selectedArtist.playcount || 0,
-  bio: 'Artist biography not available from suggestions.',
-  mbid: selectedArtist.mbid || null, 
-};
-
+    const artistData = {
+      name: selectedArtist.name,
+      image: selectedArtist.image?.[2]?.['#text'] || '',
+      listeners: selectedArtist.listeners || 0,
+      playcount: selectedArtist.playcount || 0,
+      bio: 'Artist biography not available from suggestions.',
+      mbid: selectedArtist.mbid || null,
+    };
+  
+    // if (!artistData.mbid) {
+    //   setError('Artist mbid is required but missing. Please select a valid artist.');
+    //   return;
+    // }
+  
+    setLoading(true);
+    setError('');
+    setSuccess('');
   
     try {
       const response = await axios.post('http://localhost:3000/api/artists/add', artistData);
@@ -56,14 +65,15 @@ const artistData = {
       console.log('Artist added response:', response.data);
   
       setSuccess('Artist added successfully!');
-      setError('');
       setArtistName('');
       setSuggestions([]);
       setSelectedArtist(null);
     } catch (err) {
-      console.error('Error adding artist:', err); // Log error for debugging
-      setError('Failed to add artist. Please try again later.');
-      setSuccess('');
+      console.error('Error adding artist:', err);
+      const errorMessage = err.response?.data?.error || 'Failed to add artist. Please try again later.';
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
   
