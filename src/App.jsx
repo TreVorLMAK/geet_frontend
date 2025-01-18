@@ -7,6 +7,7 @@ import AddArtist from './pages/AddArtist';
 import Artist from './pages/Artist';
 import ArtistDetail from './components/ArtistDetail';
 import AlbumDetails from './components/AlbumDetails';
+import Profile from './components/Profile';
 
 const App = () => {
   const [count, setCount] = useState(0);
@@ -21,6 +22,7 @@ const App = () => {
         <Route path="/artist" element={<Artist />} />
         <Route path="/artist/:artistName" element={<ArtistDetail />} />
         <Route path="/albums/:artistName/:albumId" element={<AlbumDetails />} />
+        <Route path="/myprofile" element={<Profile />} />
         {/* <Route path="/profile" element={<MyProfile/>} /> */}
       </Routes>
     </BrowserRouter>

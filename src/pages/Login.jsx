@@ -30,7 +30,7 @@ const Login = () => {
       localStorage.setItem('token', response.data.token);
   
       // Navigate to the homepage or dashboard after successful login
-      navigate('/profile');
+      navigate('/myprofile');
     } catch (error) {
       console.log('Login error:', error.response ? error.response.data : error.message);
     }
