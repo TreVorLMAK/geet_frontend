@@ -53,7 +53,7 @@ const Artist = () => {
           <h1 className="text-2xl font-bold">Artist List</h1>
           <button
             onClick={() => navigate('/add')}
-            className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+            className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition"
           >
             Add Artist
           </button>
@@ -65,7 +65,7 @@ const Artist = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search artists by name..."
-            className="w-full px-4 py-2 border rounded shadow focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-4 py-2 border rounded shadow focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
           />
         </div>
 
@@ -76,7 +76,7 @@ const Artist = () => {
             {filteredArtists.map((artist) => (
               <div
                 key={artist._id}
-                className="bg-gray-100 p-4 rounded-lg shadow-md flex flex-col items-center cursor-pointer"
+                className="bg-gray-100 p-4 rounded-lg shadow-md flex flex-col items-center cursor-pointer hover:bg-gray-200 transition"
                 onClick={() => navigate(`/artist/${artist.name}`)} // Navigate to the artist details page
               >
                 <img

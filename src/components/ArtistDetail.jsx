@@ -33,9 +33,9 @@ const ArtistDetail = () => {
   }
 
   // Handle click on album
-  const handleAlbumClick = (albumId) => {
-    // Redirect to the album details page
-    navigate(`/albums/${artistName}/${albumId}`);
+  const handleAlbumClick = (albumName) => {
+    // Redirect to the album details page with artistName and albumName
+    navigate(`/albums/${artistName}/${albumName}`);
   };
 
   return (
@@ -53,7 +53,7 @@ const ArtistDetail = () => {
               <div
                 key={album.mbid}
                 className="bg-gray-100 p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer"
-                onClick={() => handleAlbumClick(album.mbid)} // Handle album click
+                onClick={() => handleAlbumClick(album.name)} // Pass album.name to the handler
               >
                 <img 
                   src={album.image[2]['#text']} 
