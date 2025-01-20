@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -10,6 +11,7 @@ const AddArtist = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSearch = async (name) => {
     setArtistName(name);
@@ -35,47 +37,44 @@ const AddArtist = () => {
     setSuggestions([]); // Clear suggestions after selection
   };
 
-  const handleAddArtist = async () => {
-    if (!selectedArtist) {
-      setError('Please select an artist from the suggestions.');
-      return;
-    }
-  
-    const artistData = {
-      name: selectedArtist.name,
-      image: selectedArtist.image?.[2]?.['#text'] || '',
-      listeners: selectedArtist.listeners || 0,
-      playcount: selectedArtist.playcount || 0,
-      bio: 'Artist biography not available from suggestions.',
-      mbid: selectedArtist.mbid || null,
-    };
-  
-    // if (!artistData.mbid) {
-    //   setError('Artist mbid is required but missing. Please select a valid artist.');
-    //   return;
-    // }
-  
-    setLoading(true);
-    setError('');
-    setSuccess('');
-  
-    try {
-      const response = await axios.post('http://localhost:3000/api/artists/add', artistData);
-  
-      console.log('Artist added response:', response.data);
-  
-      setSuccess('Artist added successfully!');
-      setArtistName('');
-      setSuggestions([]);
-      setSelectedArtist(null);
-    } catch (err) {
-      console.error('Error adding artist:', err);
-      const errorMessage = err.response?.data?.error || 'Failed to add artist. Please try again later.';
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
+const handleAddArtist = async () => {
+  if (!selectedArtist) {
+    setError('Please select an artist from the suggestions.');
+    return;
+  }
+
+  const artistData = {
+    name: selectedArtist.name,
+    image: selectedArtist.image?.[2]?.['#text'] || '',
+    listeners: selectedArtist.listeners || 0,
+    playcount: selectedArtist.playcount || 0,
+    bio: 'Artist biography not available from suggestions.',
+    mbid: selectedArtist.mbid || null,
   };
+
+  setLoading(true);
+  setError('');
+  setSuccess('');
+
+  try {
+    const response = await axios.post('http://localhost:3000/api/artists/add', artistData);
+
+    console.log('Artist added response:', response.data);
+
+    setSuccess('Artist added successfully!');
+    setArtistName('');
+    setSuggestions([]);
+    setSelectedArtist(null);
+
+    navigate('/artist');
+  } catch (err) {
+    console.error('Error adding artist:', err);
+    const errorMessage = err.response?.data?.error || 'Failed to add artist. Please try again later.';
+    setError(errorMessage);
+  } finally {
+    setLoading(false);
+  }
+};
   
   return (
     <>

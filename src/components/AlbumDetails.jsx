@@ -5,12 +5,16 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 
 const AlbumDetails = () => {
-  const { albumName, artistName } = useParams();
+  const { albumName, artistName, albumId } = useParams();
   const [albumDetails, setAlbumDetails] = useState(null);
   const [review, setReview] = useState("");
+  const [rating, setRating] = useState(0);
   const [reviews, setReviews] = useState([]);
+  const [editReviewId, setEditReviewId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const username = "currentLoggedInUser"; 
 
   useEffect(() => {
     const fetchAlbumDetails = async () => {
@@ -25,10 +29,12 @@ const AlbumDetails = () => {
         }
 
         const albumData = response.data;
+        console.log(albumData)
         setAlbumDetails({
           title: albumData.name,
-          artist: artistName, 
-          description: albumData.bio, 
+          albumId: albumData.id,
+          artist: artistName,
+          description: albumData.bio,
           tracks: albumData.tracks,
           coverArt: albumData.coverArt,
         });
@@ -40,13 +46,78 @@ const AlbumDetails = () => {
       }
     };
 
-    fetchAlbumDetails();
-  }, [albumName, artistName]);
+    const fetchReviews = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/api/reviews/${artistName}/${albumId}`
+        );
+        setReviews(response.data);
+      } catch (err) {
+        console.error("Error fetching reviews:", err);
+      }
+    };
 
-  const handleReviewSubmit = () => {
-    if (review.trim()) {
-      setReviews([...reviews, review]);
+    fetchAlbumDetails();
+    fetchReviews();
+  }, [albumId, artistName]);
+
+  const handleReviewSubmit = async () => {
+    if (!review.trim() || rating <= 0) {
+      alert("Please provide both a review and a rating.");
+      return;
+    }
+
+    try {
+      const newReview = {
+        username,
+        review,
+        rating,
+        albumName,
+        artistName,
+      };
+
+      const response = await axios.post("http://localhost:3000/api/reviews", newReview);
+      setReviews([...reviews, response.data]);
       setReview("");
+      setRating(0);
+    } catch (err) {
+      console.error("Error posting review:", err);
+    }
+  };
+
+  const handleDeleteReview = async (id) => {
+    try {
+      await axios.delete(`http://localhost:3000/api/reviews/${id}`);
+      setReviews(reviews.filter((rev) => rev._id !== id));
+    } catch (err) {
+      console.error("Error deleting review:", err);
+    }
+  };
+
+  const handleEditReview = (id, currentReview, currentRating) => {
+    setEditReviewId(id);
+    setReview(currentReview);
+    setRating(currentRating);
+  };
+
+  const handleUpdateReview = async () => {
+    try {
+      const updatedReview = { review, rating };
+      const response = await axios.put(
+        `http://localhost:3000/api/reviews/${editReviewId}`,
+        updatedReview
+      );
+
+      setReviews(
+        reviews.map((rev) =>
+          rev._id === editReviewId ? { ...rev, ...response.data } : rev
+        )
+      );
+      setEditReviewId(null);
+      setReview("");
+      setRating(0);
+    } catch (err) {
+      console.error("Error updating review:", err);
     }
   };
 
@@ -79,14 +150,20 @@ const AlbumDetails = () => {
             <div className="mt-6">
               <h3 className="text-xl font-semibold mb-4">Tracks</h3>
               <ul>
-                {albumDetails.tracks && albumDetails.tracks.map((track, index) => (
-                  <li key={index} className="text-gray-700 mb-2">
-                    <span className="font-bold">{index + 1}. </span>
-                    <a href={track.url} target="_blank" rel="noopener noreferrer" className="font-bold">
-                      {track.name}
-                    </a>
-                  </li>
-                ))}
+                {albumDetails.tracks &&
+                  albumDetails.tracks.map((track, index) => (
+                    <li key={index} className="text-gray-700 mb-2">
+                      <span className="font-bold">{index + 1}. </span>
+                      <a
+                        href={track.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-bold"
+                      >
+                        {track.name}
+                      </a>
+                    </li>
+                  ))}
               </ul>
             </div>
 
@@ -99,18 +176,58 @@ const AlbumDetails = () => {
                 placeholder="Write your review..."
                 className="w-full h-32 p-2 border rounded-md mb-2"
               />
+              
+              {/* Rating Dropdown */}
+              <select
+                value={rating}
+                onChange={(e) => setRating(Number(e.target.value))}
+                className="w-full p-2 border rounded-md mb-2"
+              >
+                <option value={0} disabled>Select Rating (0-5)</option>
+                {[...Array(6)].map((_, i) => (
+                  <option key={i} value={i}>
+                    {i}
+                  </option>
+                ))}
+              </select>
+              
               <button
-                onClick={handleReviewSubmit}
+                onClick={editReviewId ? handleUpdateReview : handleReviewSubmit}
                 className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
               >
-                Submit Review
+                {editReviewId ? "Update Review" : "Submit Review"}
               </button>
 
               <div className="mt-4 space-y-4">
                 {reviews.length > 0 ? (
-                  reviews.map((rev, index) => (
-                    <div key={index} className="p-4 bg-gray-100 rounded-md">
-                      <p>{rev}</p>
+                  reviews.map((rev) => (
+                    <div
+                      key={rev._id}
+                      className="p-4 bg-gray-100 rounded-md flex justify-between items-center"
+                    >
+                      <div>
+                        <p className="font-bold">{rev.username}</p>
+                        <p>Rating: {rev.rating}</p>
+                        <p>{rev.review}</p>
+                      </div>
+                      {rev.username === username && (
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() =>
+                              handleEditReview(rev._id, rev.review, rev.rating)
+                            }
+                            className="text-blue-500 hover:underline"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteReview(rev._id)}
+                            className="text-red-500 hover:underline"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ))
                 ) : (
