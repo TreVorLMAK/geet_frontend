@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Footer from './Footer';
 import Navbar from './Navbar';
+import { useParams } from 'react-router-dom';
 
 const Profile = () => {
+  const {artistName} = useParams();
   const [user, setUser] = useState(null);
   const [reviews, setReviews] = useState([]);
 
@@ -95,7 +97,7 @@ const Profile = () => {
                       {review.albumName}
                     </h3>
                     <p className="mt-2 text-gray-700 dark:text-gray-300">
-                      <strong>Artist:</strong> {review.artist}
+                      <strong>Artist:</strong> {review.artistName}
                     </p>
                     <p className="mt-2 text-gray-700 dark:text-gray-300">
                       <strong>Your Review:</strong> {review.reviewText}

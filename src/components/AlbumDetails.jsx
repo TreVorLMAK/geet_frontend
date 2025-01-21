@@ -5,7 +5,7 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 
 const AlbumDetails = () => {
-  const { albumName, artistName, albumId } = useParams();
+  const { albumName, artistName } = useParams();
   const [albumDetails, setAlbumDetails] = useState(null);
   const [review, setReview] = useState("");
   const [rating, setRating] = useState(0);
@@ -14,8 +14,9 @@ const AlbumDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const username = "currentLoggedInUser"; 
+  const username = localStorage.getItem("username") || "guest";
 
+  // Fetch album details and reviews
   useEffect(() => {
     const fetchAlbumDetails = async () => {
       try {
@@ -29,10 +30,9 @@ const AlbumDetails = () => {
         }
 
         const albumData = response.data;
-        console.log(albumData)
         setAlbumDetails({
           title: albumData.name,
-          albumId: albumData.id,
+          mbid: albumData.id,
           artist: artistName,
           description: albumData.bio,
           tracks: albumData.tracks,
@@ -46,38 +46,55 @@ const AlbumDetails = () => {
       }
     };
 
-    const fetchReviews = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:3000/api/reviews/${artistName}/${albumId}`
-        );
-        setReviews(response.data);
-      } catch (err) {
-        console.error("Error fetching reviews:", err);
-      }
-    };
-
     fetchAlbumDetails();
-    fetchReviews();
-  }, [albumId, artistName]);
+  }, [albumName, artistName]);
+
+  useEffect(() => {
+    if (albumDetails?.mbid) {
+      const fetchReviews = async () => {
+        try {
+          const response = await axios.get(`http://localhost:3000/api/reviews/album/${albumDetails.mbid}`);
+          setReviews(response.data.reviews);  // Ensure the reviews include the username
+        } catch (err) {
+          console.error("Error fetching reviews:", err);
+        }
+      };
+
+      fetchReviews();
+    }
+  }, [albumDetails]);
 
   const handleReviewSubmit = async () => {
-    if (!review.trim() || rating <= 0) {
-      alert("Please provide both a review and a rating.");
+    if (!review.trim() || rating <= 0 || !albumDetails?.mbid) {
+      alert("Please provide a review, rating, and album ID.");
       return;
     }
 
     try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        alert("You must be logged in to submit a review.");
+        return;
+      }
+
       const newReview = {
-        username,
-        review,
+        albumId: albumDetails.mbid,
         rating,
-        albumName,
-        artistName,
+        reviewText: review,
       };
 
-      const response = await axios.post("http://localhost:3000/api/reviews", newReview);
-      setReviews([...reviews, response.data]);
+      const response = await axios.post(
+        "http://localhost:3000/api/reviews",
+        newReview,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setReviews([...reviews, response.data.review]); // Assuming response has 'review' key
       setReview("");
       setRating(0);
     } catch (err) {
@@ -176,21 +193,22 @@ const AlbumDetails = () => {
                 placeholder="Write your review..."
                 className="w-full h-32 p-2 border rounded-md mb-2"
               />
-              
               {/* Rating Dropdown */}
               <select
                 value={rating}
                 onChange={(e) => setRating(Number(e.target.value))}
                 className="w-full p-2 border rounded-md mb-2"
               >
-                <option value={0} disabled>Select Rating (0-5)</option>
+                <option value={0} disabled>
+                  Select Rating (0-5)
+                </option>
                 {[...Array(6)].map((_, i) => (
                   <option key={i} value={i}>
                     {i}
                   </option>
                 ))}
               </select>
-              
+
               <button
                 onClick={editReviewId ? handleUpdateReview : handleReviewSubmit}
                 className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
@@ -206,15 +224,15 @@ const AlbumDetails = () => {
                       className="p-4 bg-gray-100 rounded-md flex justify-between items-center"
                     >
                       <div>
-                        <p className="font-bold">{rev.username}</p>
+                        <p className="font-bold">{rev.username}</p> {/* Displaying username */}
                         <p>Rating: {rev.rating}</p>
-                        <p>{rev.review}</p>
+                        <p>{rev.reviewText}</p>
                       </div>
                       {rev.username === username && (
                         <div className="flex space-x-2">
                           <button
                             onClick={() =>
-                              handleEditReview(rev._id, rev.review, rev.rating)
+                              handleEditReview(rev._id, rev.reviewText, rev.rating)
                             }
                             className="text-blue-500 hover:underline"
                           >

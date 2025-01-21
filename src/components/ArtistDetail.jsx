@@ -1,23 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useParams, useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useParams, useNavigate } from 'react-router-dom'; 
 import Footer from './Footer';
 import Navbar from './Navbar';
 
 const ArtistDetail = () => {
-  const { artistName } = useParams(); // Extract artist name from the URL
+  const { artistName, albumId } = useParams();
   const [artist, setArtist] = useState(null);
   const [albums, setAlbums] = useState([]);
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchArtistData = async () => {
       try {
-        // Fetch artist details 
         const artistResponse = await axios.get(`http://localhost:3000/api/artists/${artistName}`);
         setArtist(artistResponse.data);
 
-        // Fetch albums for the artist
         const albumResponse = await axios.get(`http://localhost:3000/api/albums/fetch/${artistName}`);
         setAlbums(albumResponse.data.albums);
       } catch (err) {
@@ -32,10 +30,8 @@ const ArtistDetail = () => {
     return <div>Loading...</div>;
   }
 
-  // Handle click on album
-  const handleAlbumClick = (albumName) => {
-    // Redirect to the album details page with artistName and albumName
-    navigate(`/albums/${artistName}/${albumName}`);
+  const handleAlbumClick = (albumName, albumId) => {
+    navigate(`/albums/${artistName}/${albumName}/${albumId}`);
   };
 
   return (
@@ -53,7 +49,7 @@ const ArtistDetail = () => {
               <div
                 key={album.mbid}
                 className="bg-gray-100 p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer"
-                onClick={() => handleAlbumClick(album.name)} // Pass album.name to the handler
+                onClick={() => handleAlbumClick(album.name, album.mbid)} // Pass both album.name and album.mbid
               >
                 <img 
                   src={album.image[2]['#text']} 
