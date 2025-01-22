@@ -3,6 +3,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import ConfirmationModal from "./ConfirmationModal"; // Import the modal
 
 const AlbumDetails = () => {
   const { albumName, artistName } = useParams();
@@ -13,6 +14,8 @@ const AlbumDetails = () => {
   const [editReviewId, setEditReviewId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);  // Modal state
+  const [selectedReviewId, setSelectedReviewId] = useState(null);  // Store selected review ID for confirmation
 
   const username = localStorage.getItem("username") || "guest";
 
@@ -54,7 +57,7 @@ const AlbumDetails = () => {
       const fetchReviews = async () => {
         try {
           const response = await axios.get(`http://localhost:3000/api/reviews/album/${albumDetails.mbid}`);
-          setReviews(response.data.reviews);  // Ensure the reviews include the username
+          setReviews(response.data.reviews);
         } catch (err) {
           console.error("Error fetching reviews:", err);
         }
@@ -94,7 +97,7 @@ const AlbumDetails = () => {
         }
       );
 
-      setReviews([...reviews, response.data.review]); // Assuming response has 'review' key
+      setReviews([...reviews, response.data.review]);
       setReview("");
       setRating(0);
     } catch (err) {
@@ -102,12 +105,26 @@ const AlbumDetails = () => {
     }
   };
 
-  const handleDeleteReview = async (id) => {
+  const handleDeleteReview = async () => {
     try {
-      await axios.delete(`http://localhost:3000/api/reviews/${id}`);
-      setReviews(reviews.filter((rev) => rev._id !== id));
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        alert("You must be logged in to delete a review.");
+        return;
+      }
+
+      await axios.delete(`http://localhost:3000/api/reviews/${selectedReviewId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setReviews(reviews.filter((rev) => rev._id !== selectedReviewId));
+      setIsModalOpen(false); // Close the modal after deletion
     } catch (err) {
       console.error("Error deleting review:", err);
+      alert("Failed to delete the review. Please try again.");
     }
   };
 
@@ -118,18 +135,31 @@ const AlbumDetails = () => {
   };
 
   const handleUpdateReview = async () => {
+    if (!review.trim() || rating <= 0) {
+      alert("Please provide a review and a rating.");
+      return;
+    }
+
     try {
-      const updatedReview = { review, rating };
+      const updatedReview = { reviewText: review, rating };
+      const token = localStorage.getItem("token");
+
       const response = await axios.put(
         `http://localhost:3000/api/reviews/${editReviewId}`,
-        updatedReview
+        updatedReview,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       setReviews(
         reviews.map((rev) =>
-          rev._id === editReviewId ? { ...rev, ...response.data } : rev
+          rev._id === editReviewId ? { ...rev, ...response.data.review } : rev
         )
       );
+
       setEditReviewId(null);
       setReview("");
       setRating(0);
@@ -148,6 +178,7 @@ const AlbumDetails = () => {
 
         {albumDetails && !loading && !error && (
           <>
+            {/* Album Details */}
             <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:space-x-6">
               <img
                 src={albumDetails.coverArt || "https://via.placeholder.com/300"}
@@ -163,28 +194,7 @@ const AlbumDetails = () => {
               </div>
             </div>
 
-            {/* Track List */}
-            <div className="mt-6">
-              <h3 className="text-xl font-semibold mb-4">Tracks</h3>
-              <ul>
-                {albumDetails.tracks &&
-                  albumDetails.tracks.map((track, index) => (
-                    <li key={index} className="text-gray-700 mb-2">
-                      <span className="font-bold">{index + 1}. </span>
-                      <a
-                        href={track.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-bold"
-                      >
-                        {track.name}
-                      </a>
-                    </li>
-                  ))}
-              </ul>
-            </div>
-
-            {/* Review Section */}
+            {/* Reviews */}
             <div className="mt-6">
               <h3 className="text-xl font-semibold mb-4">Reviews</h3>
               <textarea
@@ -193,7 +203,6 @@ const AlbumDetails = () => {
                 placeholder="Write your review..."
                 className="w-full h-32 p-2 border rounded-md mb-2"
               />
-              {/* Rating Dropdown */}
               <select
                 value={rating}
                 onChange={(e) => setRating(Number(e.target.value))}
@@ -224,7 +233,7 @@ const AlbumDetails = () => {
                       className="p-4 bg-gray-100 rounded-md flex justify-between items-center"
                     >
                       <div>
-                        <p className="font-bold">{rev.username}</p> {/* Displaying username */}
+                        <p className="font-bold text-blue-400">{rev.username}</p>
                         <p>Rating: {rev.rating}</p>
                         <p>{rev.reviewText}</p>
                       </div>
@@ -239,7 +248,10 @@ const AlbumDetails = () => {
                             Edit
                           </button>
                           <button
-                            onClick={() => handleDeleteReview(rev._id)}
+                            onClick={() => {
+                              setSelectedReviewId(rev._id); // Set the selected review for deletion
+                              setIsModalOpen(true); // Open the modal
+                            }}
                             className="text-red-500 hover:underline"
                           >
                             Delete
@@ -256,6 +268,16 @@ const AlbumDetails = () => {
           </>
         )}
       </div>
+
+      {/* Confirmation Modal */}
+      {isModalOpen && (
+        <ConfirmationModal
+          onCancel={() => setIsModalOpen(false)} // Close modal on cancel
+          onConfirm={handleDeleteReview} // Confirm delete action
+          message="Are you sure you want to delete this review?"
+        />
+      )}
+      
       <Footer />
     </>
   );

@@ -26,7 +26,8 @@ const Login = () => {
       });
       console.log('Login successful:', response.data);
   
-      // Store token in localStorage (or you can store it in cookies)
+      // Store token in localStorage 
+      localStorage.setItem("username", response.data.user.username);
       localStorage.setItem('token', response.data.token);
   
       // Navigate to the homepage or dashboard after successful login
