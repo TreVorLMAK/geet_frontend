@@ -1,30 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import Footer from './Footer';
 import Navbar from './Navbar';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const Profile = () => {
-  const {artistName} = useParams();
+  const { artistName } = useParams();
   const [user, setUser] = useState(null);
   const [reviews, setReviews] = useState([]);
+  const navigate = useNavigate(); // React Router navigate hook
 
   useEffect(() => {
-    // Retrieve the token from localStorage (or wherever you're storing it)
-    const token = localStorage.getItem('token'); // Adjust based on your storage mechanism
+    const token = localStorage.getItem('token'); 
 
     if (!token) {
-      // Handle the case where the token is missing (e.g., show a login prompt)
       console.error('No token found');
       return;
     }
 
-    // Fetch user data
     const fetchUserData = async () => {
       try {
         const userResponse = await fetch('http://localhost:3000/api/user/profile', {
           method: 'GET',
           headers: {
-            Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+            Authorization: `Bearer ${token}`,
           },
         });
 
@@ -39,13 +37,12 @@ const Profile = () => {
       }
     };
 
-    // Fetch user reviews
     const fetchUserReviews = async () => {
       try {
         const reviewsResponse = await fetch('http://localhost:3000/api/reviews/user', {
           method: 'GET',
           headers: {
-            Authorization: `Bearer ${token}`, // Include the token here as well
+            Authorization: `Bearer ${token}`,
           },
         });
 
@@ -62,7 +59,7 @@ const Profile = () => {
 
     fetchUserData();
     fetchUserReviews();
-  }, []); 
+  }, []);
 
   if (!user) {
     return <div>Loading...</div>;
@@ -92,9 +89,19 @@ const Profile = () => {
             {reviews.length > 0 ? (
               <ul className="mt-4 space-y-4">
                 {reviews.map((review) => (
-                  <li key={review.id} className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg shadow-md">
+                  <li
+                    key={review.id}
+                    className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg shadow-md cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                    onClick={() =>
+                      navigate(
+                        `/albums/${encodeURIComponent(review.artistName)}/${encodeURIComponent(
+                          review.albumName
+                        )}/${review.album}`
+                      )
+                    } // Redirect to the detailed album route
+                  >
                     <h3 className="text-xl font-bold text-gray-800 dark:text-white">
-                      {review.albumName}
+                      <strong>Album: </strong> {review.albumName}
                     </h3>
                     <p className="mt-2 text-gray-700 dark:text-gray-300">
                       <strong>Artist:</strong> {review.artistName}
