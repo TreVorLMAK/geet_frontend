@@ -1,65 +1,92 @@
-import React, { useState, useEffect } from 'react';
-import Footer from './Footer';
-import Navbar from './Navbar';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import Footer from "./Footer";
+import Navbar from "./Navbar";
+import { useParams, useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const { artistName } = useParams();
   const [user, setUser] = useState(null);
   const [reviews, setReviews] = useState([]);
+  const [bio, setBio] = useState(""); // State for the bio
+  const [isEditing, setIsEditing] = useState(false); // Toggle edit mode
   const navigate = useNavigate(); // React Router navigate hook
 
   useEffect(() => {
-    const token = localStorage.getItem('token'); 
+    const token = localStorage.getItem("token");
 
     if (!token) {
-      console.error('No token found');
+      console.error("No token found");
       return;
     }
 
     const fetchUserData = async () => {
       try {
-        const userResponse = await fetch('http://localhost:3000/api/user/profile', {
-          method: 'GET',
+        const userResponse = await fetch("http://localhost:3000/api/user/profile", {
+          method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
         if (!userResponse.ok) {
-          throw new Error('Failed to fetch user data');
+          throw new Error("Failed to fetch user data");
         }
 
         const userData = await userResponse.json();
         setUser(userData);
+        setBio(userData.data.bio || ""); // Initialize bio with existing value
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error("Error fetching user data:", error);
       }
     };
 
     const fetchUserReviews = async () => {
       try {
-        const reviewsResponse = await fetch('http://localhost:3000/api/reviews/user', {
-          method: 'GET',
+        const reviewsResponse = await fetch("http://localhost:3000/api/reviews/user", {
+          method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
         if (!reviewsResponse.ok) {
-          throw new Error('Failed to fetch reviews');
+          throw new Error("Failed to fetch reviews");
         }
 
         const reviewsData = await reviewsResponse.json();
         setReviews(reviewsData);
       } catch (error) {
-        console.error('Error fetching reviews:', error);
+        console.error("Error fetching reviews:", error);
       }
     };
 
     fetchUserData();
     fetchUserReviews();
   }, []);
+
+  const handleBioSave = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch("http://localhost:3000/api/user/update-bio", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ bio }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update bio");
+      }
+
+      const updatedUser = await response.json();
+      setUser(updatedUser);
+      setIsEditing(false); // Exit edit mode
+    } catch (error) {
+      console.error("Error updating bio:", error);
+    }
+  };
 
   if (!user) {
     return <div>Loading...</div>;
@@ -81,6 +108,43 @@ const Profile = () => {
             <p className="mt-2 text-gray-700 dark:text-gray-300">
               <strong>Email:</strong> {user.data.email}
             </p>
+            {/* Bio Section */}
+            <div className="mt-4">
+              <h2 className="text-lg font-semibold text-purple-700">Bio</h2>
+              {isEditing ? (
+                <>
+                  <textarea
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    className="w-full mt-2 p-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                    rows="4"
+                    placeholder="Write something about yourself..."
+                  />
+                  <button
+                    onClick={handleBioSave}
+                    className="mt-2 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    className="mt-2 ml-2 px-4 py-2 bg-gray-500 text-white font-semibold rounded-lg hover:bg-gray-600 transition"
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="mt-2 text-gray-700 dark:text-gray-300">{bio || "No bio added yet."}</p>
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="mt-2 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition"
+                  >
+                    Edit Bio
+                  </button>
+                </>
+              )}
+            </div>
           </div>
 
           {/* User Reviews */}

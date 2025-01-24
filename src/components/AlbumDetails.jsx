@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import ConfirmationModal from "./ConfirmationModal"; // Import the modal
@@ -14,8 +14,8 @@ const AlbumDetails = () => {
   const [editReviewId, setEditReviewId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);  // Modal state
-  const [selectedReviewId, setSelectedReviewId] = useState(null);  // Store selected review ID for confirmation
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
+  const [selectedReviewId, setSelectedReviewId] = useState(null); // Store selected review ID for confirmation
 
   const username = localStorage.getItem("username") || "guest";
 
@@ -56,7 +56,9 @@ const AlbumDetails = () => {
     if (albumDetails?.mbid) {
       const fetchReviews = async () => {
         try {
-          const response = await axios.get(`http://localhost:3000/api/reviews/album/${albumDetails.mbid}`);
+          const response = await axios.get(
+            `http://localhost:3000/api/reviews/album/${albumDetails.mbid}`
+          );
           setReviews(response.data.reviews);
         } catch (err) {
           console.error("Error fetching reviews:", err);
@@ -114,11 +116,14 @@ const AlbumDetails = () => {
         return;
       }
 
-      await axios.delete(`http://localhost:3000/api/reviews/${selectedReviewId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await axios.delete(
+        `http://localhost:3000/api/reviews/${selectedReviewId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       setReviews(reviews.filter((rev) => rev._id !== selectedReviewId));
       setIsModalOpen(false); // Close the modal after deletion
@@ -186,7 +191,9 @@ const AlbumDetails = () => {
                 className="w-full sm:w-1/3 h-64 object-cover rounded-md mb-4 sm:mb-0"
               />
               <div className="sm:flex-1">
-                <h2 className="text-2xl font-bold mb-2">{albumDetails.title}</h2>
+                <h2 className="text-2xl font-bold mb-2">
+                  {albumDetails.title}
+                </h2>
                 <p className="text-lg mb-2">{albumDetails.artist}</p>
                 <p className="text-gray-700 text-justify">
                   {albumDetails.description || "No description available."}
@@ -233,7 +240,14 @@ const AlbumDetails = () => {
                       className="p-4 bg-gray-100 rounded-md flex justify-between items-center"
                     >
                       <div>
-                        <p className="font-bold text-blue-400">{rev.username}</p>
+                        <p className="font-bold text-blue-400">
+                          <Link
+                            to={`/Profile/${rev.username}`}
+                            className="hover:underline"
+                          >
+                            {rev.username}
+                          </Link>
+                        </p>
                         <p>Rating: {rev.rating}</p>
                         <p>{rev.reviewText}</p>
                       </div>
@@ -241,7 +255,11 @@ const AlbumDetails = () => {
                         <div className="flex space-x-2">
                           <button
                             onClick={() =>
-                              handleEditReview(rev._id, rev.reviewText, rev.rating)
+                              handleEditReview(
+                                rev._id,
+                                rev.reviewText,
+                                rev.rating
+                              )
                             }
                             className="text-blue-500 hover:underline"
                           >
@@ -277,7 +295,7 @@ const AlbumDetails = () => {
           message="Are you sure you want to delete this review?"
         />
       )}
-      
+
       <Footer />
     </>
   );
