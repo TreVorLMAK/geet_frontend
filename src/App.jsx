@@ -9,6 +9,9 @@ import ArtistDetail from './components/ArtistDetail';
 import AlbumDetails from './components/AlbumDetails';
 import Profile from './components/Profile';
 import UserProfile from './components/UserProfile';
+import Donation from './pages/Donation';
+import CompleteDonation from './pages/CompleteDonation';
+
 
 const App = () => {
   const [count, setCount] = useState(0);
@@ -25,6 +28,8 @@ const App = () => {
         <Route path="/albums/:artistName/:albumName/:albumId" element={<AlbumDetails />} />
         <Route path="/myprofile" element={<Profile />} />
         <Route path="/Profile/:username" element={<UserProfile />} />
+        <Route path="/donate" element={<Donation />} />
+        <Route path="/complete-donation" element={<CompleteDonation />} />
       </Routes>
     </BrowserRouter>
   );
