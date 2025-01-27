@@ -1,43 +1,57 @@
-import React, { useState } from 'react'
-import Navbar from '../components/Navbar'
-import { Link, useNavigate } from 'react-router-dom'
-import Footer from '../components/Footer'
-import axios from 'axios'
+import React, { useState } from 'react';
+import Navbar from '../components/Navbar';
+import { Link, useNavigate } from 'react-router-dom';
+import Footer from '../components/Footer';
+import axios from 'axios';
 
 const Login = () => {
-  const [showPassword, setShowPassword] = useState(false)
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const navigate = useNavigate()  // Initialize useNavigate
+  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev)
-  }
+    setShowPassword((prev) => !prev);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
-      const response = await axios.post('http://localhost:3000/api/auth/login', {
-        email,
-        password,
-      }, {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      const response = await axios.post(
+        'http://localhost:3000/api/auth/login',
+        { email, password },
+        { headers: { 'Content-Type': 'application/json' } }
+      );
       console.log('Login successful:', response.data);
-  
-      // Store token in localStorage 
-      localStorage.setItem("username", response.data.user.username);
+
+      // Store token and username in localStorage
+      localStorage.setItem('username', response.data.user.username);
       localStorage.setItem('token', response.data.token);
-  
-      // Navigate to the homepage or dashboard after successful login
+
+      // Navigate to the user's profile
       navigate('/myprofile');
     } catch (error) {
       console.log('Login error:', error.response ? error.response.data : error.message);
     }
   };
+
+  const handleGoogleLogin = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/api/auth/google/callback');
   
+      if (response.data && response.data.token) {
+        // Store the token and username in localStorage
+        localStorage.setItem('username', response.data.user.username);
+        localStorage.setItem('token', response.data.token);
   
+        // Navigate to the user's profile
+        navigate('/myprofile');
+      }
+    } catch (error) {
+      console.error('Google login error:', error);
+    }
+  };
 
   return (
     <>
@@ -102,44 +116,48 @@ const Login = () => {
               <hr className="border-gray-300" />
             </div>
 
-            <button className="bg-white border py-2 w-full rounded-xl mt-5 flex justify-center items-center text-sm hover:scale-105 duration-300 hover:bg-[#60a8bc4f] font-medium">
+            <button
+              onClick={handleGoogleLogin}
+              className="bg-white border py-2 w-full rounded-xl mt-5 flex justify-center items-center text-sm hover:scale-105 duration-300 hover:bg-[#60a8bc4f] font-medium"
+            >
               <svg className="mr-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="25px">
                 <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
                 <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path>
                 <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path>
                 <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path>
               </svg>
-
               Login with Google
             </button>
 
-            <div className="mt-10 text-sm border-b border-gray-500 py-5 playfair tooltip">Forgot password?</div>
+            <div className="mt-5 text-xs border-b border-gray-400 py-4 text-[#002D74]">
+              <Link to="/forgot-password" className="underline">
+                Forgot your password?
+              </Link>
+            </div>
 
-            <Link to="/register">
-              <button
-                className="hover:border register text-white bg-[#002D74] hover:border-gray-400 rounded-xl py-2 px-5 hover:scale-110 hover:bg-[#002c7424] font-semibold duration-300"
-                aria-label="Register a new account"
-                title="Register"
+            <div className="mt-3 text-xs flex justify-between items-center text-[#002D74]">
+              <p>Don&apos;t have an account?</p>
+              <Link
+                to="/signup"
+                className="py-2 px-5 bg-white border rounded-xl hover:scale-110 duration-300 font-medium"
               >
                 Register
-              </button>
-            </Link>
+              </Link>
+            </div>
           </div>
 
-          <div className="md:block hidden w-1/2">
+          <div className="w-1/2 hidden md:block">
             <img
-              className="rounded-2xl max-h-[1600px]"
-              src="https://images.unsplash.com/photo-1552010099-5dc86fcfaa38?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NzEyNjZ8MHwxfHNlYXJjaHwxfHxmcmVzaHxlbnwwfDF8fHwxNzEyMTU4MDk0fDA&ixlib=rb-4.0.3&q=80&w=1080"
-              alt="login form image"
+              className="rounded-2xl"
+              src="https://images.pexels.com/photos/1438081/pexels-photo-1438081.jpeg?auto=compress&cs=tinysrgb&w=600"
+              alt="Login Background"
             />
           </div>
         </div>
       </section>
-      <br />
       <Footer />
-      <br />
     </>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;
