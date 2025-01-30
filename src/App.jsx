@@ -11,6 +11,10 @@ import Profile from './components/Profile';
 import UserProfile from './components/UserProfile';
 import Donation from './pages/Donation';
 import CompleteDonation from './pages/CompleteDonation';
+import VerifyOTP from './pages/VerifyOtp';
+import ForgotPassword from './pages/ForgotPassword';
+import SetNewPassword from './pages/SetNewPassword';
+import ResetOtp from './pages/ResetOtp';
 
 
 const App = () => {
@@ -30,6 +34,10 @@ const App = () => {
         <Route path="/Profile/:username" element={<UserProfile />} />
         <Route path="/donate" element={<Donation />} />
         <Route path="/complete-donation" element={<CompleteDonation />} />
+        <Route path="/verify-otp" element={<VerifyOTP />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/set-new-password" element={<SetNewPassword />} />
+        <Route path="/reset-otp" element={<ResetOtp />} />
 
       </Routes>
     </BrowserRouter>

@@ -110,7 +110,7 @@ const Login = () => {
               </button>
             </form>
 
-            <div className="mt-6 items-center text-gray-100">
+            {/* <div className="mt-6 items-center text-gray-100">
               <hr className="border-gray-300" />
               <p className="text-center text-sm">OR</p>
               <hr className="border-gray-300" />
@@ -133,12 +133,12 @@ const Login = () => {
               <Link to="/forgot-password" className="underline">
                 Forgot your password?
               </Link>
-            </div>
+            </div> */}
 
             <div className="mt-3 text-xs flex justify-between items-center text-[#002D74]">
               <p>Don&apos;t have an account?</p>
               <Link
-                to="/signup"
+                to="/register"
                 className="py-2 px-5 bg-white border rounded-xl hover:scale-110 duration-300 font-medium"
               >
                 Register
