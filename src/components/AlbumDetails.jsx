@@ -23,7 +23,7 @@ const AlbumDetails = () => {
   useEffect(() => {
     const fetchAlbumDetails = async () => {
       try {
-        const url = `http://localhost:3000/api/albums/details/${artistName}/${albumName}`;
+        const url = `https://geet-backend.onrender.com/api/albums/details/${artistName}/${albumName}`;
         const response = await axios.get(url);
 
         if (response.status !== 200) {
@@ -57,7 +57,7 @@ const AlbumDetails = () => {
       const fetchReviews = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:3000/api/reviews/album/${albumDetails.mbid}`
+            `https://geet-backend.onrender.com/api/reviews/album/${albumDetails.mbid}`
           );
           setReviews(response.data.reviews);
         } catch (err) {
@@ -90,7 +90,7 @@ const AlbumDetails = () => {
       };
 
       const response = await axios.post(
-        "http://localhost:3000/api/reviews",
+        "https://geet-backend.onrender.com/api/reviews",
         newReview,
         {
           headers: {
@@ -117,7 +117,7 @@ const AlbumDetails = () => {
       }
 
       await axios.delete(
-        `http://localhost:3000/api/reviews/${selectedReviewId}`,
+        `https://geet-backend.onrender.com/api/reviews/${selectedReviewId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -150,7 +150,7 @@ const AlbumDetails = () => {
       const token = localStorage.getItem("token");
 
       const response = await axios.put(
-        `http://localhost:3000/api/reviews/${editReviewId}`,
+        `https://geet-backend.onrender.com/api/reviews/${editReviewId}`,
         updatedReview,
         {
           headers: {

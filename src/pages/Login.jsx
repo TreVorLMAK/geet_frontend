@@ -19,7 +19,7 @@ const Login = () => {
 
     try {
       const response = await axios.post(
-        'http://localhost:3000/api/auth/login',
+        'https://geet-backend.onrender.com/api/auth/login',
         { email, password },
         { headers: { 'Content-Type': 'application/json' } }
       );
@@ -38,7 +38,7 @@ const Login = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/auth/google/callback');
+      const response = await axios.get('https://geet-backend.onrender.com/api/auth/google/callback');
   
       if (response.data && response.data.token) {
         // Store the token and username in localStorage
