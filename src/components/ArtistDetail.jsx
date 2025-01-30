@@ -13,10 +13,10 @@ const ArtistDetail = () => {
   useEffect(() => {
     const fetchArtistData = async () => {
       try {
-        const artistResponse = await axios.get(`http://localhost:3000/api/artists/${artistName}`);
+        const artistResponse = await axios.get(`https://geet-backend.onrender.com/api/artists/${artistName}`);
         setArtist(artistResponse.data);
 
-        const albumResponse = await axios.get(`http://localhost:3000/api/albums/fetch/${artistName}`);
+        const albumResponse = await axios.get(`https://geet-backend.onrender.com/api/albums/fetch/${artistName}`);
         setAlbums(albumResponse.data.albums);
       } catch (err) {
         console.error('Error fetching artist details or albums', err);

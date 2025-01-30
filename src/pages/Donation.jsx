@@ -15,7 +15,7 @@ const Donation = () => {
 
     setLoading(true);
 
-    fetch("http://localhost:3000/api/khalti/initiate-donation", {
+    fetch("https://geet-backend.onrender.com/api/khalti/initiate-donation", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

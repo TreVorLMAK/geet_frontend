@@ -20,7 +20,7 @@ const ResetOtp = () => {
 
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:3000/api/auth/reset-otp", {
+      const response = await fetch("https://geet-backend.onrender.com/api/auth/reset-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp }),

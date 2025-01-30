@@ -57,7 +57,7 @@ const handleAddArtist = async () => {
   setSuccess('');
 
   try {
-    const response = await axios.post('http://localhost:3000/api/artists/add', artistData);
+    const response = await axios.post('https://geet-backend.onrender.com/api/artists/add', artistData);
 
     console.log('Artist added response:', response.data);
 

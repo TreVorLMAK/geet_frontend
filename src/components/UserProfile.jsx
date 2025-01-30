@@ -16,7 +16,7 @@ const UserProfile = () => {
     const fetchUserData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3000/api/reviews/user/${username}`
+          `https://geet-backend.onrender.com/api/reviews/user/${username}`
         );
         const { user, reviews } = response.data;
         setUserDetails(user);

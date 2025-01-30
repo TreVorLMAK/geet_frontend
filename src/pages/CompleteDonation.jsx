@@ -19,7 +19,7 @@ const CompleteDonation = () => {
       };
 
       try {
-        const response = await fetch(`http://localhost:3000/api/khalti/complete-donation?${new URLSearchParams(params)}`);
+        const response = await fetch(`https://geet-backend.onrender.com/api/khalti/complete-donation?${new URLSearchParams(params)}`);
         const result = await response.json();
         setLoading(false);
         if (result.success) {

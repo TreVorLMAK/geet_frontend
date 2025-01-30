@@ -15,7 +15,7 @@ const Artist = () => {
   useEffect(() => {
     const fetchArtists = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/artists'); // Fetch artists
+        const response = await axios.get('https://geet-backend.onrender.com/api/artists'); // Fetch artists
         setArtists(response.data);
         setFilteredArtists(response.data); // Initialize filtered list
       } catch (err) {
