@@ -90,7 +90,7 @@ const AlbumDetails = () => {
       };
 
       const response = await axios.post(
-        "http://localhost:3000/api/reviews",
+        "https://geet-backend.onrender.com/api/reviews",
         newReview,
         {
           headers: {
