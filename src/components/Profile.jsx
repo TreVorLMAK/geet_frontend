@@ -21,7 +21,7 @@ const Profile = () => {
 
     const fetchUserData = async () => {
       try {
-        const userResponse = await fetch("http://localhost:3000/api/user/profile", {
+        const userResponse = await fetch("https://geet-backend.onrender.com/api/user/profile", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -42,7 +42,7 @@ const Profile = () => {
 
     const fetchUserReviews = async () => {
       try {
-        const reviewsResponse = await fetch("http://localhost:3000/api/reviews/user", {
+        const reviewsResponse = await fetch("https://geet-backend.onrender.com/api/reviews/user", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -67,7 +67,7 @@ const Profile = () => {
   const handleBioSave = async () => {
     const token = localStorage.getItem("token");
     try {
-      const response = await fetch("http://localhost:3000/api/user/update-bio", {
+      const response = await fetch("https://geet-backend.onrender.com/api/user/update-bio", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
